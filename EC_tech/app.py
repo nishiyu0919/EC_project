@@ -30,7 +30,7 @@ def login():
       session['user'] = True
       session.permanent = True
       app.permanent_session_lifetime = timedelta(minutes=1)
-      return redirect(url_for('mypage'))
+      return redirect(url_for('top'))
    else :
     error = 'ユーザ名またはパスワードが違います。'
     input_data = {'user_name':user_name, 'password':password}
