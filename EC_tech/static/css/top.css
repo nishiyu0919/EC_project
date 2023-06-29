@@ -1,52 +1,80 @@
-h1{
-    font-size: 40px;
+@charset "UTF-8";
+
+body {
+  background-color: #FCE2C4;
+  background-size: cover;
 }
 
 header {
-  height: 100px;
+  height: 40px;
   width: 100%;
   padding: 40px 0;
-  background-color: black;
-  color: white;
-  position: relative; /* 追加 */
+  background-color: white;
+  color: black;
+  position: relative;
 }
+
+h1 {
+  font-size: 30px;
+}
+
+
 
 ul {
   list-style: none;
   margin: 0;
   padding: 0;
-  list-style-type: none;
   display: flex;
-  border-left: solid 1px #3dbfb8;
   justify-content: flex-end;
-  position: absolute; /* 追加 */
-  bottom: 0; /* 追加 */
-  left: 0; /* 追加 */
-  right: 0; /* 追加 */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 li {
   padding: 10px 20px;
-  background: #e3f6f5;
-  border-top: solid 1px #3dbfb8;
-  border-bottom: solid 1px #3dbfb8;
-  border-right: solid 1px #3dbfb8;
-  display: inline;
   text-align: center;
+  font-size: 20px;
 }
 
+li:hover {
+  text-decoration: underline;
+  color: blue;
+}
 
+li:not(:hover) {
+  text-decoration: none;
+  color: initial;
+}
+
+ul li a {
+  text-decoration: none;
+  color: inherit;
+}
+
+#search-form {
+  display: flex;
+  justify-content: center; /* 水平中央揃え */
+  margin-top: -50px; /* 上部の余白を調整 */
+  margin-bottom: 90px;
   
+}
 
+#search-input {
+  padding: 5px 10px; /* 入力フィールドのパディングを調整 */
+}
 
+button[type="submit"] {
+  padding: 5px 10px; /* ボタンのパディングを調整 */
+}
 
 footer {
-    width: 100%;
-    height: 80px; 
-    text-align: center;
-    padding: 40px 0;
-    background-color: black;
-    position: absolute;
-    bottom: 0;
-  }
-
+  width: 100%;
+  height: 40px;
+  text-align: center;
+  padding: 40px 0;
+  background-color: white;
+  position: absolute;
+  bottom: 0;
+}
