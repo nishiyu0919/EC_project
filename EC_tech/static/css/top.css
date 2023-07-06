@@ -5,6 +5,7 @@ body {
   background-size: cover;
 }
 
+
 header {
   height: 40px;
   width: 100%;
@@ -12,6 +13,8 @@ header {
   background-color: white;
   color: black;
   position: relative;
+  z-index: 2; 
+
 }
 
 h1 {
@@ -51,22 +54,30 @@ li:not(:hover) {
 ul li a {
   text-decoration: none;
   color: inherit;
+  display: flex;
+  justify-content: center; /* 水平中央揃え */
+  position: relative; /* 相対的な位置指定を行うために追加 */
+  top: 90px;
+  margin-bottom: 90px;
+  z-index: 1;
 }
 
 #search-form {
   display: flex;
   justify-content: center; /* 水平中央揃え */
-  margin-top: -50px; /* 上部の余白を調整 */
+  position: relative; /* 相対的な位置指定を行うために追加 */
+  top: -50px;
   margin-bottom: 90px;
+  z-index: 1;
   
 }
 
 #search-input {
-  padding: 5px 10px; /* 入力フィールドのパディングを調整 */
+  padding: 5px 30px; /* 入力フィールドのパディングを調整 */
 }
 
 button[type="submit"] {
-  padding: 5px 10px; /* ボタンのパディングを調整 */
+  padding: 5px 15px; /* ボタンのパディングを調整 */
 }
 
 footer {
