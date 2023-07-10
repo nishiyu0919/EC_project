@@ -25,7 +25,7 @@ def login():
         password = request.form.get('password')
 
         if db.login(user_name, password):
-            session['user'] = True
+            session['user'] = user_name  # ユーザー名をセッションに格納
             session.permanent = True
             app.permanent_session_lifetime = timedelta(minutes=1)
             return redirect(url_for('top'))
@@ -39,12 +39,12 @@ def login():
 
 @app.route('/top', methods=['GET'])
 def top():
-    msg = request.args.get('msg')
-
     if 'user' in session:
-        return render_template('top.html', msg=msg)
+        return render_template('top.html', username=session['user'])
     else:
-        return redirect(url_for('index'))
+        return render_template('index.html', msg='ログインが必要です')
+
+
 
 
 @app.route('/logout')

@@ -6,20 +6,27 @@
 <title>ショップのトップメニュー</title>
 </head>
 <body>
-<header>
-  <h1>トップ画面へようこそ！</h1>
-  <form id="search-form">
-    <input type="text" id="search-input" placeholder="検索キーワードを入力">
-    <button type="submit">検索</button>
-  </form>
+  <header>
+    <h1>トップ画面へようこそ！</h1>
+    <form id="search-form">
+      <input type="text" id="search-input" placeholder="検索キーワードを入力">
+      <button type="submit">検索</button>
+    </form>
   
-  <ul>
-    <li><a href="{{ url_for('login') }}">ログイン</a></li>
-    <li><a href="#">カート</a></li>
-    <li><a href="#">検索</a></li>
-    <li><a href="#">おすすめ</a></li>
-  </ul>
-</header>
+    <ul>
+      {% if 'user' in session %}
+        <li><a href="{{ url_for('login') }}">{{ session['user'] }}</a>さん</li>
+      {% else %}
+        <li><a href="{{ url_for('login') }}">ログイン</a></li>
+      {% endif %}
+      <li><a href="#">カート</a></li>
+      <li><a href="#">検索</a></li>
+      <li><a href="#">おすすめ</a></li>
+    </ul>
+  </header>
+  
+  
+  
 
 <script>
   document.getElementById('search-form').addEventListener('submit', function(e) {
