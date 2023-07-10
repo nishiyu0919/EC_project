@@ -2,20 +2,26 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title></title>
+<link rel="stylesheet" href="static/css/top.css">
+<title>ユーザー登録</title>
 </head>
 <body>
-    <h3>ユーザー登録画面</h3>
-    {% if error != null %}
-    <p style="color:red">{{error}}</p>
-    {% endif %}
-    {% if msg != null %}
-    <p style="color:blue">{{msg}}</p>
-    {% endif %}
-    <form action="{{url_for('register_exe')}}" method="post">
-    ユーザー名：<input type="text" name="username"><br>
-    パスワード：<input type="password" name="password"><br>
-    <button type="submit">ログイン</button>
-    </form>
-    </body>
+<header>
+  <h3>ユーザー登録画面</h3>
+  {% if error %}
+    <p style="color:red">{{ error }}</p>
+  {% endif %}
+  {% if msg %}
+    <p style="color:blue">{{ msg }}</p>
+  {% endif %}
+  <form action="{{ url_for('register_exe') }}" method="post">
+    ユーザー名：<input type="text" name="username" required><br>
+    パスワード：<input type="password" name="password" required><br>
+    <button type="submit">登録</button>
+  </form>
+</header>
+<footer>
+  <p><font color="black">© nishi's various shop 2023.</font></p>
+</footer>
+</body>
 </html>

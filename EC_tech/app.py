@@ -52,6 +52,33 @@ def logout():
     session.pop('user', None)
     return redirect(url_for('index'))
 
+@app.route('/register')
+def register_form():
+ return render_template('register.html')
+
+@app.route('/register_exe', methods=['POST'])
+def register_exe():
+    user_name = request.form.get('username')
+    password = request.form.get('password')
+
+    if user_name.strip() == '' or password.strip() == '':
+        error = 'ユーザー名とパスワードは必須です。'
+        return render_template('register.html', error=error)
+
+    if db.is_username_taken(user_name):
+        error = 'そのユーザー名は既に使用されています。別のユーザー名を選択してください。'
+        return render_template('register.html', error=error)
+
+    count = db.insert_user(user_name, password)
+
+    if count == 1:
+        msg = '登録が完了しました。'
+        return render_template('index.html', msg=msg)
+    else:
+        error = '登録に失敗しました。'
+        return render_template('register.html', error=error)
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

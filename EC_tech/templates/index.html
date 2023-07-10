@@ -2,8 +2,10 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<link rel="stylesheet" href="static/css/top.css">
 <title>ログイン画面</title>
 </head>
+<header>
 <body>
   <h3>ログイン画面</h3>
   {% if error is defined and error != "" %}
@@ -17,5 +19,11 @@
     パスワード：<input type="password" name="password"><br>
     <button type="submit">ログイン</button>
   </form>
+  <a href="{{url_for('register_form')}}">新規登録</a>
+  </header>
+</header>
+<footer>
+    <p><font color="black">© nishi's various shop 2023.</font></p>
+  </footer>
 </body>
 </html>
