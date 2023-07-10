@@ -15,30 +15,34 @@ def index():
     if msg is None or request.referrer == url_for('login'):
         return render_template('top.html')
     else:
-        return render_template('top.html', msg=msg)
+        return render_template('index.html', msg=msg)
 
 
-
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    user_name = request.form.get('username')
-    password = request.form.get('password')
+    if request.method == 'POST':
+        user_name = request.form.get('username')
+        password = request.form.get('password')
 
-    if db.login(user_name, password):
-        session['user'] = True
-        session.permanent = True
-        app.permanent_session_lifetime = timedelta(minutes=1)
-        return redirect(url_for('top'))
+        if db.login(user_name, password):
+            session['user'] = True
+            session.permanent = True
+            app.permanent_session_lifetime = timedelta(minutes=1)
+            return redirect(url_for('top'))
+        else:
+            error = 'ユーザ名またはパスワードが違います。'
+            input_data = {'user_name': user_name, 'password': password}
+            return render_template('index.html', error=error, data=input_data)
     else:
-        error = 'ユーザ名またはパスワードが違います。'
-        input_data = {'user_name': user_name, 'password': password}
-        return render_template('index.html', error=error, data=input_data)
+        return render_template('index.html')
 
 
 @app.route('/top', methods=['GET'])
 def top():
+    msg = request.args.get('msg')
+
     if 'user' in session:
-        return render_template('top.html')
+        return render_template('top.html', msg=msg)
     else:
         return redirect(url_for('index'))
 
@@ -47,26 +51,6 @@ def top():
 def logout():
     session.pop('user', None)
     return redirect(url_for('index'))
-
-
-@app.route('/register')
-def register_form():
-    return render_template('register.html')
-
-
-@app.route('/register_exe', methods=['POST'])
-def register_exe():
-    user_name = request.form.get('username')
-    password = request.form.get('password')
-
-    count = db.insert_user(user_name, password)
-
-    if count == 1:
-        msg = '登録が完了しました。'
-        return render_template('index.html', msg=msg)
-    else:
-        error = '登録に失敗しました。'
-        return render_template('register.html', error=error)
 
 
 if __name__ == "__main__":
