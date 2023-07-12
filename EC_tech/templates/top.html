@@ -20,12 +20,23 @@
         <li><a href="{{ url_for('login') }}">ログイン</a></li>
       {% endif %}
       <li><a href="#">カート</a></li>
-      <li><a href="#">検索</a></li>
+      <li><a href="{{ url_for('admin') }}">管理者</a></li>
       <li><a href="#">おすすめ</a></li>
     </ul>
   </header>
   
-  
+  <div id="product-list">
+    <h2>商品一覧</h2>
+    <ul>
+      {% for product in products %}
+        <li>
+          <h3>{{ product.name }}</h3>
+          <p>価格: ¥{{ product.price }}</p>
+          <p>{{ product.description }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
   
 
 <script>

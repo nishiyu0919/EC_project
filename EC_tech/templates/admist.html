@@ -15,13 +15,15 @@
       {% if msg %}
         <p style="color:blue">{{ msg }}</p>
       {% endif %}
-      <p>ユーザー名、パスワードをご入力の上、ログインボタンをクリックしてください。</p>
+      <p>管理者名、パスワードをご入力の上、ログインボタンをクリックしてください。</p>
     </div>
     <div class="login_form_btm">
-      <input type="id" name="username" placeholder="ユーザー名"><br>
+      <input type="id" name="username" placeholder="管理者名"><br>
       <input type="password" name="password" placeholder="パスワード"><br>
       <input type="submit" name="button" value="ログイン"><br>
-      <a href="{{url_for('register_form')}}">新規登録</a>
+      <a href="{{ url_for('admist_register_form') }}">新規管理者登録</a>
+
+
     </div>
   </form>
 </body>

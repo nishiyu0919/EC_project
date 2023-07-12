@@ -84,3 +84,19 @@ def login(user_name, password):
         connection.close()
         
     return flg
+
+def get_products():
+    sql = 'SELECT * FROM products'
+    
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        products = cursor.fetchall()
+    except psycopg2.DatabaseError:
+        products = []
+    finally:
+        cursor.close()
+        connection.close()
+        
+    return products

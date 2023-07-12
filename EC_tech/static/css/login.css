@@ -1,0 +1,16 @@
+form {
+    text-align: center;
+    padding: 30px 0;
+  }
+  
+  .login_form_btm {
+    padding: 80px 0;
+    background-color: #F7F7F7;
+    margin: 80px 0;
+  }
+  
+  input {
+    width: 200px;
+    padding: 3px;
+    margin: 5px 0;
+  }
