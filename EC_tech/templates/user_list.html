@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="static/css/list.css">
+<title>登録ユーザー一覧</title>
+</head>
+<body>
+    <h1>登録ユーザーの一覧表</h1>
+    <p>{{ session['admin'] }}が管理者として使用しています。</p>
+    <table>
+        <thead>
+            <tr>
+                <th><user>ユーザ名</user></th>
+                <th><pass>パスワード</pass></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td><user>{{ user[1] }}</user></td>
+                <td><pass>{{ user[2] }}</pass></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="button-container">
+        <a href="{{ url_for('return_edit') }}" class="button">戻る</a>
+    </div>
+</body>
+</html>

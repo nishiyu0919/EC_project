@@ -93,7 +93,7 @@ def register_exe():
 
 @app.route('/admin', methods=['GET'])
 def admin():
-    if 'user' in session:
+    if 'admin' not in session:
         return redirect(url_for('admin_login'))
 
     msg = request.args.get('msg')
@@ -101,7 +101,9 @@ def admin():
     if msg is None or request.referrer == url_for('admin_login'):
         return render_template('edit.html')
     else:
-        return render_template('admist.html', msg=msg)
+        users = db.get_users()  # ユーザ一覧を取得
+        return render_template('admist.html', msg=msg, users=users)
+
 
 
 @app.route('/admin/login', methods=['GET', 'POST'])
@@ -180,6 +182,44 @@ def admin_register_exe():
 @app.route('/return_top', methods=['GET'])
 def return_top():
         return render_template('top.html')
+    
+@app.route('/user_list')
+def user_list():
+    users = db.get_users()  # ユーザ一覧を取得
+    return render_template('user_list.html', users=users)
+
+    
+@app.route('/return_edit')
+def return_edit():
+    if 'admin' in session:
+        return redirect(url_for('edit'))
+    else:
+        return redirect(url_for('admin_login'), msg='ログインが必要です')
+
+@app.route('/product/add', methods=['GET', 'POST'])
+def product_add():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        price = float(request.form.get('price'))
+        description = request.form.get('description')
+
+        if db.is_product_name_taken(name):
+            error = '同じ名前の商品が既に登録されています。別の名前を選択してください。'
+            return render_template('products.html', error=error)
+
+        count = db.insert_product(name, price, description)
+
+        if count == 1:
+            msg='商品が登録されました'
+            return render_template('products.html', msg=msg)
+        else:
+            error = '商品の登録に失敗しました。'
+            return render_template('products.html', error=error)
+
+    return render_template('products.html')
+    
+        
+
 
 
 if __name__ == "__main__":

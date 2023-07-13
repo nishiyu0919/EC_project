@@ -170,3 +170,58 @@ def insert_admin(user_name, password):
         connection.close()
 
     return count
+
+def get_users():
+    sql = 'SELECT * FROM shop_user'
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        users = cursor.fetchall()
+    except psycopg2.DatabaseError:
+        users = []
+    finally:
+        cursor.close()
+        connection.close()
+
+    return users
+
+def insert_product(name, price, description):
+    sql = 'INSERT INTO products (name, price, description) VALUES (%s, %s, %s)'
+
+    count = 0
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        if is_product_name_taken(name):
+            count = -1
+        else:
+            cursor.execute(sql, (name, price, description))
+            count = cursor.rowcount
+            connection.commit()
+    except psycopg2.DatabaseError:
+        count = 0
+    finally:
+        cursor.close()
+        connection.close()
+
+    return count
+
+def is_product_name_taken(name):
+    sql = 'SELECT COUNT(*) FROM products WHERE name = %s'
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(sql, (name,))
+        count = cursor.fetchone()[0]
+    except psycopg2.DatabaseError:
+        count = 0
+    finally:
+        cursor.close()
+        connection.close()
+
+    return count > 0

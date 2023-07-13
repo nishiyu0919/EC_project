@@ -10,9 +10,9 @@
     <p>ここは、管理者用の編集画面です。</p>
     <p>管理者名: {{ session['admin'] }}</p>
     <div class="login_form_btm">
-      <a href="#">登録ユーザーの一覧</a>   
+      <a href="{{ url_for('user_list') }}">登録ユーザーの一覧</a>   
       <a href="#">登録商品の一覧</a>
-      <a href="#">商品の追加</a>
+      <a href="{{ url_for('product_add') }}">商品の追加</a>
       <a href="#">管理者編集においての注意事項</a>
       <a href="{{ url_for('return_top') }}">トップページに戻る</a>
     </div>
