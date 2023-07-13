@@ -2,11 +2,12 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="static/css/login.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 <title>ログイン画面</title>
 </head>
 <body>
-  <form name="login_form" action="{{ url_for('login') }}" method="post">
+  <form name="login_form" action="{{ url_for('admin_login') }}" method="post">
+
     <div class="login_form_top">
       <h1>ログイン画面</h1>
       {% if error is defined and error != "" %}
@@ -18,12 +19,12 @@
       <p>管理者名、パスワードをご入力の上、ログインボタンをクリックしてください。</p>
     </div>
     <div class="login_form_btm">
-      <input type="id" name="username" placeholder="管理者名"><br>
-      <input type="password" name="password" placeholder="パスワード"><br>
+      <label for="username" class="input_label">管理者名</label><br>
+      <input type="text" name="username" id="username"  pattern="^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z0-9]+$" title="英数字を組み合わせて設定してください" required><br>
+      <label for="password" class="input_label">パスワード</label><br>
+      <input type="password" name="password" id="password"  pattern="[0-9]+" title="数字のみでパスワードを設定してください" required><br>
       <input type="submit" name="button" value="ログイン"><br>
-      <a href="{{ url_for('admist_register_form') }}">新規管理者登録</a>
-
-
+      <a href="{{ url_for('admin_register_form') }}">新規管理者登録</a>
     </div>
   </form>
 </body>

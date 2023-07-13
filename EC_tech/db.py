@@ -100,3 +100,73 @@ def get_products():
         connection.close()
         
     return products
+
+def admin_login(user_name, password):
+    sql = 'SELECT hashed_password, salt FROM admist WHERE name = %s'
+    flg = False
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(sql, (user_name,))
+        admin = cursor.fetchone()
+
+        if admin is not None:
+            hashed_password = get_hash(password, admin[1])  # saltを使用してパスワードをハッシュ化
+
+            if hashed_password == admin[0]:
+                flg = True
+    except psycopg2.DatabaseError as e:
+        error = str(e)
+        print(error)  # エラーメッセージをコンソールに表示
+        flg = False
+    finally:
+        cursor.close()
+        connection.close()
+
+    return flg
+
+
+
+def is_admin_username_taken(user_name):
+    sql = 'SELECT COUNT(*) FROM admist WHERE name = %s'
+    
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(sql, (user_name,))
+        count = cursor.fetchone()[0]
+    except psycopg2.DatabaseError:
+        count = 0
+    finally:
+        cursor.close()
+        connection.close()
+        
+    return count > 0
+
+def insert_admin(user_name, password):
+    sql = 'INSERT INTO admist (name, hashed_password, salt) VALUES (%s, %s, %s)'
+
+    salt = get_salt()
+    hashed_password = get_hash(password, salt)
+    count = 0
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        if is_admin_username_taken(user_name):
+            count = -1
+        else:
+            cursor.execute(sql, (user_name, hashed_password, salt))
+            count = cursor.rowcount
+            connection.commit()
+    except psycopg2.DatabaseError as e:
+        error = str(e)
+        print(error)  # エラーメッセージをコンソールに表示
+        count = 0
+    finally:
+        cursor.close()
+        connection.close()
+
+    return count

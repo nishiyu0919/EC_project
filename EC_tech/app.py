@@ -91,15 +91,23 @@ def register_exe():
         return render_template('register.html', error=error)
 
 
-@app.route('/admin')
+@app.route('/admin', methods=['GET'])
 def admin():
-    # 管理者ページの処理を実装
-    # 管理者のログイン状態を確認し、管理者のみがアクセスできるようにするなどの処理を行う
-    return redirect(url_for('admist_login'))
+    if 'user' in session:
+        return redirect(url_for('admin_login'))
+
+    msg = request.args.get('msg')
+
+    if msg is None or request.referrer == url_for('admin_login'):
+        return render_template('edit.html')
+    else:
+        return render_template('admist.html', msg=msg)
 
 
 @app.route('/admin/login', methods=['GET', 'POST'])
-def admist_login():
+def admin_login():
+    
+    
     if request.method == 'POST':
         user_name = request.form.get('username')
         password = request.form.get('password')
@@ -112,21 +120,24 @@ def admist_login():
             session['admin'] = user_name  # 管理者名をセッションに格納
             session.permanent = True
             app.permanent_session_lifetime = timedelta(minutes=1)
-            return redirect(url_for('edit'))
+            return redirect(url_for('admin'))
         else:
             error = '管理者名またはパスワードが違います。'
             input_data = {'user_name': user_name, 'password': password}
             return render_template('admist.html', error=error, data=input_data)
+        
     else:
         return render_template('admist.html')
 
 
-@app.route('/admin/edit')
+
+@app.route('/edit', methods=['GET'])
 def edit():
     if 'admin' in session:
-        return render_template('edit.html')
+        return render_template('edit.html', username=session['admin'])
     else:
-        return redirect(url_for('admist_login'))
+        return redirect(url_for('admin'), msg='ログインが必要です')
+
 
 
 @app.route('/admin/logout')
@@ -136,13 +147,12 @@ def admin_logout():
 
 
 @app.route('/admin/register')
-def admist_register_form():
+def admin_register_form():
     return render_template('admist_register.html')
 
 
-
 @app.route('/admin/register_exe', methods=['POST'])
-def admist_register_exe():
+def admin_register_exe():
     user_name = request.form.get('username')
     password = request.form.get('password')
 
@@ -162,7 +172,7 @@ def admist_register_exe():
 
     if count == 1:
         msg = '登録が完了しました。'
-        return render_template('admist_register.html', msg=msg)
+        return render_template('admist.html', msg=msg)
     else:
         error = '登録に失敗しました。'
         return render_template('admist_register.html', error=error)
