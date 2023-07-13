@@ -24,7 +24,8 @@
       <label for="password" class="input_label">パスワード</label><br>
       <input type="password" name="password" id="password"  pattern="[0-9]+" title="数字のみでパスワードを設定してください" required><br>
       <input type="submit" name="button" value="ログイン"><br>
-      <a href="{{ url_for('admin_register_form') }}">新規管理者登録</a>
+      <a href="{{ url_for('admin_register_form') }}">新規管理者登録</a><br>
+      <a href="{{ url_for('return_top') }}">トップページに戻る</a>
     </div>
   </form>
 </body>

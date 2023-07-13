@@ -177,6 +177,10 @@ def admin_register_exe():
         error = '登録に失敗しました。'
         return render_template('admist_register.html', error=error)
 
+@app.route('/return_top', methods=['GET'])
+def return_top():
+        return render_template('top.html')
+
 
 if __name__ == "__main__":
     app.run(debug=True)
