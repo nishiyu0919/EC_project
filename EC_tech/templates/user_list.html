@@ -38,7 +38,7 @@
         <tbody id="userTable">
             {% for user in users %}
             <tr>
-                <td>{{ user[1] }}</td>
+                <td><a href="javascript:void(0);" onclick="setUsername('{{ user[1] }}')">{{ user[1] }}</a></td>
             </tr>
             {% endfor %}
         </tbody>
@@ -63,7 +63,7 @@
                 allUsers.forEach(name => {
                     const row = document.createElement('tr');
                     const cell = document.createElement('td');
-                    cell.textContent = name;
+                    cell.innerHTML = `<a href="javascript:void(0);" onclick="setUsername('${name}')">${name}</a>`;
                     row.appendChild(cell);
                     userTable.appendChild(row);
                 });
@@ -80,7 +80,7 @@
             matchedUsers.forEach(name => {
                 const row = document.createElement('tr');
                 const cell = document.createElement('td');
-                cell.textContent = name;
+                cell.innerHTML = `<a href="javascript:void(0);" onclick="setUsername('${name}')">${name}</a>`;
                 row.appendChild(cell);
                 userTable.appendChild(row);
             });
@@ -93,6 +93,11 @@
                 row.appendChild(cell);
                 userTable.appendChild(row);
             }
+        }
+
+        function setUsername(name) {
+            // ユーザー名の欄にクリックされたユーザー名を設定する
+            inputUsername.value = name;
         }
 
         function submitForm() {

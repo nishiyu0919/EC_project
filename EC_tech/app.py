@@ -219,10 +219,6 @@ def product_add():
 
     return render_template('products.html')
     
-@app.route('/product/list')
-def product_list():
-    products = db.get_products()  # 商品リストを取得するための関数を実装する（db.pyなどに追加が必要）
-    return render_template('products_list.html', products=products)
         
 @app.route('/delete_user', methods=['POST'])
 def delete_user():
@@ -254,6 +250,38 @@ def delete_user():
         # 削除失敗した場合にエラーメッセージと更新後のユーザーデータをテンプレートに渡す
         return render_template('user_list.html', error=error, users=updated_users)
 
+@app.route('/product/list')
+def product_list():
+    search_keyword = request.args.get('search')
+
+    if search_keyword:
+        products = db.search_products_by_name(search_keyword)
+    else:
+        products = db.get_products()
+
+    return render_template('products_list.html', products=products)
+
+@app.route('/product/delete', methods=['POST'])
+def delete_product():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+
+    product_name = request.form.get('product_name')
+    
+    
+    if product_name is None:
+        msg='商品が見つかりませんでした。'
+        return render_template('products_list.html', msg=msg, products=products)
+
+    count = db.delete_product_by_name(product_name)
+    products = db.get_products()
+
+    if count == 1:
+        msg = '商品を削除しました。'
+        return render_template('products_list.html', msg=msg , products=products)
+    else:
+        error = '商品が見つかりませんでした。'
+        return render_template('products_list.html', error=error , products=products)
 
 if __name__ == "__main__":
     app.run(debug=True)

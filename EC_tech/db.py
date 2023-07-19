@@ -276,3 +276,20 @@ def get_users():
         connection.close()
 
     return users
+
+def delete_product_by_name(name):
+    sql = 'DELETE FROM products WHERE name = %s'
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(sql, (name,))
+        connection.commit()
+        count = cursor.rowcount
+    except psycopg2.DatabaseError:
+        count = 0
+    finally:
+        cursor.close()
+        connection.close()
+
+    return count

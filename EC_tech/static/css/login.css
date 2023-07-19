@@ -14,9 +14,11 @@ form {
     padding: 3px;
     margin: 5px 0;
   }
+  
   .input_label {
     display: inline-block;
     width: 200px;
     text-align: left;
   }
+  
   

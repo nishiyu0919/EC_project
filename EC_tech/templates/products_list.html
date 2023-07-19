@@ -1,33 +1,150 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="static/css/product_list.css">
-<title>登録商品一覧</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/css/list.css">
+    <title>商品一覧</title>
 </head>
 <body>
-    <h1>登録商品一覧</h1>
-    {% if products %}
+    <h1>商品一覧</h1>
+    <p>{{ session['admin'] }}が管理者として使用しています。</p>
+
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    
+    {% if msg %}
+    <p style="color: blue;">{{ msg }}</p>
+    {% endif %}
+    <form id="deleteForm" method="post" action="{{ url_for('delete_product') }}">
+        <label for="product_name">削除したい商品の名前：</label>
+        <!-- 商品名を自動補完するためのdatalistを追加 -->
+        <input type="text" id="product_name" name="product_name" required list="product_names">
+        <datalist id="product_names">
+            {% for product in products %}
+                <option value="{{ product[1] }}">
+            {% endfor %}
+        </datalist>
+        <a1><a href="javascript:void(0);" class="button" onclick="submitForm()">削除</a></a1>
+    </form>
+
     <table>
         <thead>
             <tr>
                 <th>商品名</th>
                 <th>価格</th>
+                <th>説明</th>
             </tr>
         </thead>
-        <tbody id="userTable">
+        <tbody id="productTable">
             {% for product in products %}
-            <tr>
-                <td>{{ product[1] }}</td>
-                <td>{{ product[2] }}円</td>
-            </tr>
+                <tr>
+                    <td><a href="javascript:void(0);" onclick="setProductName('{{ product[1] }}')">{{ product[1] }}</a></td>
+                    <td>{{ product[2] }}</td>
+                    <td>{{ product[3] }}</td>
+                </tr>
             {% endfor %}
         </tbody>
     </table>
-    
-    {% else %}
-    <p>登録された商品はありません。</p>
-    {% endif %}
-    <a href="{{ url_for('return_edit') }}" class="button">戻る</a>
+
+    <div class="button-container">
+        <a href="{{ url_for('return_edit') }}" class="button">戻る</a>
+    </div>
+
+    <!-- JavaScriptの追加 -->
+    <script>
+        const inputProductName = document.getElementById('product_name');
+        const productTable = document.getElementById('productTable');
+        const deleteForm = document.getElementById('deleteForm');
+        const allProductNames = [{% for product in products %}"{{ product[1] }}", {% endfor %}];
+
+        function searchProduct() {
+            const searchValue = inputProductName.value;
+            if (!searchValue) {
+                // 入力が空の場合はデータベースに入っているすべての商品を表示
+                productTable.innerHTML = '';
+                allProductNames.forEach(name => {
+                    const row = document.createElement('tr');
+                    const nameCell = document.createElement('td');
+                    const nameLink = document.createElement('a');
+                    nameLink.href = 'javascript:void(0);';
+                    nameLink.textContent = name;
+                    nameLink.onclick = function () {
+                        setProductName(name);
+                    };
+                    nameCell.appendChild(nameLink);
+                    row.appendChild(nameCell);
+                    const priceCell = document.createElement('td');
+                    priceCell.textContent = allProducts[name]['price'];
+                    row.appendChild(priceCell);
+                    const descriptionCell = document.createElement('td');
+                    descriptionCell.textContent = allProducts[name]['description'];
+                    row.appendChild(descriptionCell);
+                    productTable.appendChild(row);
+                });
+                return;
+            }
+
+            // テーブルの内容をクリア
+            productTable.innerHTML = '';
+
+            // 商品リストから一致する名前を探す
+            const matchedNames = allProductNames.filter(name => name.includes(searchValue));
+
+            // テーブルに一致する商品を表示
+            matchedNames.forEach(name => {
+                const row = document.createElement('tr');
+                const nameCell = document.createElement('td');
+                const nameLink = document.createElement('a');
+                nameLink.href = 'javascript:void(0);';
+                nameLink.textContent = name;
+                nameLink.onclick = function () {
+                    setProductName(name);
+                };
+                nameCell.appendChild(nameLink);
+                row.appendChild(nameCell);
+                const priceCell = document.createElement('td');
+                priceCell.textContent = allProducts[name]['price'];
+                row.appendChild(priceCell);
+                const descriptionCell = document.createElement('td');
+                descriptionCell.textContent = allProducts[name]['description'];
+                row.appendChild(descriptionCell);
+                productTable.appendChild(row);
+            });
+
+            if (matchedNames.length === 0) {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.textContent = 'その名前の商品は登録されていません';
+                cell.style.color = 'red'; // 赤文字に設定
+                row.appendChild(cell);
+                productTable.appendChild(row);
+            }
+        }
+
+        function submitForm() {
+            // フォームの内容を送信する
+            deleteForm.submit();
+        }
+
+        function setProductName(name) {
+            // 商品名の欄にクリックされた商品名を設定する
+            inputProductName.value = name;
+        }
+
+        // inputイベントで自動補完を実行
+        inputProductName.addEventListener('input', searchProduct);
+
+        // 商品リストをJavaScriptで保持
+        const allProducts = {
+            {% for product in products %}
+                "{{ product[1] }}": {
+                    "price": "{{ product[2] }}",
+                    "description": "{{ product[3] }}"
+                },
+            {% endfor %}
+        };
+
+    </script>
 </body>
 </html>

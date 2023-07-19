@@ -1,0 +1,42 @@
+form {
+    text-align: center;
+    padding: 30px 0;
+    padding: 80px 0;
+    background-color: #F7F7F7;
+    margin: 40px 0;
+  }
+  
+
+  input {
+    width: 200px;
+    padding: 3px;
+    margin: 5px 0;
+  }
+
+textarea{
+    width: 200px;
+    padding: 3px;
+    margin: 5px 0;
+}
+
+  .input_label {
+    display: inline-block;
+    width: 200px;
+    text-align: left;
+  }
+
+  a.button {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.button-container {
+    text-align: right; /* コンテナ内のコンテンツを中央揃え */
+    margin-right: 220px; /* ボタンとテーブルを少し離すためのマージン */
+    
+}

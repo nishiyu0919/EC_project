@@ -2,12 +2,12 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="static/css/login.css">
+<link rel="stylesheet" href="/static/css/product.css">
 <title>商品の登録</title>
 </head>
 <body>
     <h1>商品の登録</h1>
-
+    <p>{{ session['admin'] }}が管理者として使用しています。</p>
     {% if error is defined and error != "" %}
     <p style="color:red">{{ error }}</p>
   {% endif %}
@@ -15,23 +15,28 @@
     <p style="color:blue">{{ msg }}</p>
   {% endif %}
     <form action="{{ url_for('product_add') }}" method="POST">
-        <div class="form-group">
-            <label for="name">商品名:</label>
-            <input type="text" id="name" name="name" required>
-        </div>
-        <div class="form-group">
-            <label for="price">価格:</label>
-            <input type="number" id="price" name="price" step="0.01" required>
-        </div>
-        <div class="form-group">
-            <label for="description">説明:</label>
-            <textarea id="description" name="description" required></textarea>
-        </div>
-        <div class="form-group">
-            <input type="submit" value="登録">
-        </div>
+    <div class="form">
+        
+            <label for="name" class="input_label">商品名</label><br>
+            <input type="text" id="name" name="name" required ><br>
+        
+        
+            <label for="price" class="input_label">価格</label><br>
+            <input type="number" id="price" name="price" required ><br>
+        
+        
+            <label for="description" class="input_label">説明</label><br>
+            <textarea id="description" name="description" required></textarea><br>
+            <input type="submit" value="登録"><br>
+        
+           
+    </div>    
+       
+    <div class="button-container"> <!-- ボタンを右寄せするための追加 -->
+        <a href="{{ url_for('return_edit') }}" class="button">戻る</a>
+    </div>
     </form>
-    
-    <a href="{{ url_for('return_edit') }}" class="button">戻る</a>
+  
+   
 </body>
 </html>
