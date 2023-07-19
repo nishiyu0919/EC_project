@@ -225,3 +225,54 @@ def is_product_name_taken(name):
         connection.close()
 
     return count > 0
+
+def get_user_by_username(username):
+    sql = 'SELECT * FROM shop_user WHERE name = %s'
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(sql, (username,))
+        user = cursor.fetchone()
+    except psycopg2.DatabaseError:
+        user = None
+    finally:
+        cursor.close()
+        connection.close()
+
+    return user
+
+def delete_user(user_id):
+    sql = 'DELETE FROM shop_user WHERE id = %s'
+    
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(sql, (user_id,))
+        connection.commit()
+        count = cursor.rowcount
+    except psycopg2.DatabaseError:
+        count = 0
+    finally:
+        cursor.close()
+        connection.close()
+        
+    return count
+
+# 他の関数はここに記述
+
+def get_users():
+    sql = 'SELECT * FROM shop_user'
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        users = cursor.fetchall()
+    except psycopg2.DatabaseError:
+        users = []
+    finally:
+        cursor.close()
+        connection.close()
+
+    return users

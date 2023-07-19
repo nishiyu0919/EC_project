@@ -1,31 +1,108 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="static/css/list.css">
-<title>登録ユーザー一覧</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="static/css/list.css">
+    <title>登録ユーザー一覧</title>
 </head>
 <body>
     <h1>登録ユーザーの一覧表</h1>
     <p>{{ session['admin'] }}が管理者として使用しています。</p>
+    
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    
+    {% if msg %}
+    <p style="color: blue;">{{ msg }}</p>
+    {% endif %}
+    
+    <form id="deleteForm" method="post" action="{{ url_for('delete_user') }}">
+        <label for="username">削除したいユーザー名：</label>
+        <!-- ユーザー名を自動補完するためのdatalistを追加 -->
+        <input type="text" id="username" name="username" required list="usernames">
+        <datalist id="usernames">
+            {% for user in users %}
+                <option value="{{ user[1] }}">
+            {% endfor %}
+        </datalist>
+        <a1><a href="javascript:void(0);" class="button" onclick="submitForm()">削除</a></a1>
+    </form>
+
     <table>
         <thead>
             <tr>
-                <th><user>ユーザ名</user></th>
-                <th><pass>パスワード</pass></th>
+                <th>ユーザ名</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="userTable">
             {% for user in users %}
             <tr>
-                <td><user>{{ user[1] }}</user></td>
-                <td><pass>{{ user[2] }}</pass></td>
+                <td>{{ user[1] }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    
     <div class="button-container">
         <a href="{{ url_for('return_edit') }}" class="button">戻る</a>
     </div>
+
+    <!-- JavaScriptの追加 -->
+    <script>
+        const inputUsername = document.getElementById('username');
+        const userTable = document.getElementById('userTable');
+        const deleteForm = document.getElementById('deleteForm');
+        const allUsers = [{% for user in users %}"{{ user[1] }}", {% endfor %}];
+
+        function searchUser() {
+            const searchValue = inputUsername.value;
+            if (!searchValue) {
+                // 入力が空の場合はデータベースに入っているすべてのユーザーを表示
+                userTable.innerHTML = '';
+                allUsers.forEach(name => {
+                    const row = document.createElement('tr');
+                    const cell = document.createElement('td');
+                    cell.textContent = name;
+                    row.appendChild(cell);
+                    userTable.appendChild(row);
+                });
+                return;
+            }
+
+            // テーブルの内容をクリア
+            userTable.innerHTML = '';
+
+            // ユーザーリストから一致する名前を探す
+            const matchedUsers = allUsers.filter(name => name.includes(searchValue));
+
+            // テーブルに一致するユーザーを表示
+            matchedUsers.forEach(name => {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.textContent = name;
+                row.appendChild(cell);
+                userTable.appendChild(row);
+            });
+
+            if (matchedUsers.length === 0) {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.textContent = 'そのユーザー名は登録されていません';
+                cell.style.color = 'red'; // 赤文字に設定
+                row.appendChild(cell);
+                userTable.appendChild(row);
+            }
+        }
+
+        function submitForm() {
+            // フォームの内容を送信する
+            deleteForm.submit();
+        }
+
+        // inputイベントで自動補完を実行
+        inputUsername.addEventListener('input', searchUser);
+
+    </script>
 </body>
 </html>

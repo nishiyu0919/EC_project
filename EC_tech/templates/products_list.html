@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="static/css/product_list.css">
+<title>登録商品一覧</title>
+</head>
+<body>
+    <h1>登録商品一覧</h1>
+    {% if products %}
+    <table>
+        <thead>
+            <tr>
+                <th>商品名</th>
+                <th>価格</th>
+            </tr>
+        </thead>
+        <tbody id="userTable">
+            {% for product in products %}
+            <tr>
+                <td>{{ product[1] }}</td>
+                <td>{{ product[2] }}円</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% else %}
+    <p>登録された商品はありません。</p>
+    {% endif %}
+    <a href="{{ url_for('return_edit') }}" class="button">戻る</a>
+</body>
+</html>

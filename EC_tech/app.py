@@ -138,7 +138,8 @@ def edit():
     if 'admin' in session:
         return render_template('edit.html', username=session['admin'])
     else:
-        return redirect(url_for('admin'), msg='ログインが必要です')
+        msg = 'ログインが必要です'
+        return redirect(url_for('admin'), msg=msg)
 
 
 
@@ -194,7 +195,7 @@ def return_edit():
     if 'admin' in session:
         return redirect(url_for('edit'))
     else:
-        return redirect(url_for('admin_login'), msg='ログインが必要です')
+        return redirect(url_for('admin_login'))
 
 @app.route('/product/add', methods=['GET', 'POST'])
 def product_add():
@@ -218,8 +219,40 @@ def product_add():
 
     return render_template('products.html')
     
+@app.route('/product/list')
+def product_list():
+    products = db.get_products()  # 商品リストを取得するための関数を実装する（db.pyなどに追加が必要）
+    return render_template('products_list.html', products=products)
         
+@app.route('/delete_user', methods=['POST'])
+def delete_user():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
 
+    # 削除対象のユーザー名を取得
+    username = request.form.get('username')
+    # ユーザー名からデータベースで該当するユーザーを検索
+    user = db.get_user_by_username(username)
+
+    if not user:
+        error = 'ユーザーが見つかりません。'
+        # ユーザーが見つからない場合はエラーメッセージを表示してユーザーリスト画面に戻る
+        users = db.get_users()  # ユーザーリストを取得
+        return render_template('user_list.html', error=error, users=users)
+
+    # ユーザーをデータベースから削除
+    count = db.delete_user(user[0])
+
+    updated_users = db.get_users()
+    
+    if count == 1:
+        msg = 'ユーザーを削除しました。'
+        # 削除成功した場合に成功メッセージと更新後のユーザーデータをテンプレートに渡す
+        return render_template('user_list.html', msg=msg, users=updated_users)
+    else:
+        error = 'ユーザーの削除に失敗しました。'
+        # 削除失敗した場合にエラーメッセージと更新後のユーザーデータをテンプレートに渡す
+        return render_template('user_list.html', error=error, users=updated_users)
 
 
 if __name__ == "__main__":
