@@ -293,3 +293,69 @@ def delete_product_by_name(name):
         connection.close()
 
     return count
+
+def get_product_by_id(product_id):
+    sql = 'SELECT * FROM products WHERE id = %s'
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(sql, (product_id,))
+        product = cursor.fetchone()
+    except psycopg2.DatabaseError:
+        product = None
+    finally:
+        cursor.close()
+        connection.close()
+
+    return product
+
+# 商品情報を更新する関数
+def update_product(product_id, name, price, description):
+    sql = 'UPDATE products SET name = %s, price = %s, description = %s WHERE id = %s'
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(sql, (name, price, description, product_id))
+        connection.commit()
+        count = cursor.rowcount
+    except psycopg2.DatabaseError:
+        count = 0
+    finally:
+        cursor.close()
+        connection.close()
+
+    return count
+
+def get_all_products():
+    sql = 'SELECT * FROM products'
+    
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        products = cursor.fetchall()
+    except psycopg2.DatabaseError:
+        products = []
+    finally:
+        cursor.close()
+        connection.close()
+        
+    return products
+
+def search_products_by_name(name):
+    sql = 'SELECT * FROM products WHERE name ILIKE %s'
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(sql, ('%' + name + '%',))
+        products = cursor.fetchall()
+    except psycopg2.DatabaseError:
+        products = []
+    finally:
+        cursor.close()
+        connection.close()
+
+    return products

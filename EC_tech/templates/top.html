@@ -1,64 +1,50 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="static/css/top.css">
-<title>ショップのトップメニュー</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="static/css/top.css">
+  <title>ショップのトップメニュー</title>
 </head>
 <body>
   <header>
     <h1>トップ画面へようこそ！</h1>
-    <form id="search-form">
-      <input type="text" id="search-input" placeholder="検索キーワードを入力">
+    <form id="search-form" action="{{ url_for('search') }}" method="POST">
+      <input type="text" id="search-input" name="search" placeholder="検索キーワードを入力">
       <button type="submit">検索</button>
     </form>
-  
-    <ul>
+
+    <ul class="horizontal-list">
       {% if 'user' in session %}
-        <li><a href="{{ url_for('login') }}">{{ session['user'] }}</a>さん</li>
+        <li><a href="{{ url_for('login') }}">{{ session['user'] }}</a><p1>さん</p1></li>
       {% else %}
         <li><a href="{{ url_for('login') }}">ログイン</a></li>
       {% endif %}
-      <li><a href="#">カート</a></li>
+      <li><a href="{{ url_for('cart') }}">カート</a></li>
       <li><a href="{{ url_for('admin_login') }}">管理者</a></li>
       <li><a href="#">おすすめ</a></li>
     </ul>
+
   </header>
-  
+
   <div id="product-list">
     <h2>商品一覧</h2>
     <ul>
-      {% for product in products %}
-        <li>
-          <h3>{{ product.name }}</h3>
-          <p>価格: ¥{{ product.price }}</p>
-          <p>{{ product.description }}</p>
-        </li>
-      {% endfor %}
+        {% if products %}
+            {% for product in products %}
+            <li>
+              <h3><a href="{{ url_for('product_detail', product_id=product[0]) }}">{{ product[1] }}</a></h3>
+              <p>価格: ¥{{ product[2] }}</p>
+            </li>
+            {% endfor %}
+        
+        {% endif %}
     </ul>
-  </div>
-  
+    <p id="no-results" style="text-align: center; color: red;">{{ error }}</p>
+</div>
 
-<script>
-  document.getElementById('search-form').addEventListener('submit', function(e) {
-    e.preventDefault(); // フォームのデフォルトの送信動作をキャンセル
 
-    // 入力されたキーワードを取得
-    var keyword = document.getElementById('search-input').value;
-
-    // ここでキーワードに基づいた検索処理を実行
-    performSearch(keyword);
-  });
-
-  function performSearch(keyword) {
-    // この関数内でキーワードに基づいた検索処理を実装する
-    // 例えば、結果を表示するための要素を操作したり、APIを使用してリアルタイムの検索を実行したりできます
-    console.log('検索キーワード:', keyword);
-  }
-</script>
-
-<footer>
-  <p><font color="black">© nishi's various shop 2023.</font></p>
-</footer>
+  <footer>
+    <p>© nishi's various shop 2023.</p>
+  </footer>
 </body>
 </html>

@@ -28,24 +28,28 @@
         <a1><a href="javascript:void(0);" class="button" onclick="submitForm()">削除</a></a1>
     </form>
 
-    <table>
-        <thead>
-            <tr>
-                <th>商品名</th>
-                <th>価格</th>
-                <th>説明</th>
-            </tr>
-        </thead>
-        <tbody id="productTable">
-            {% for product in products %}
-                <tr>
-                    <td><a href="javascript:void(0);" onclick="setProductName('{{ product[1] }}')">{{ product[1] }}</a></td>
-                    <td>{{ product[2] }}円</td>
-                    <td>{{ product[3] }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<!-- 商品一覧のテーブル -->
+<table>
+    <thead>
+        <tr>
+            <th>商品名</th>
+            <th>価格</th>
+            <th>説明</th>
+            <th>編集</th>  <!-- 編集リンクを追加 -->
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+        <tr>
+            <td>{{ product[1] }}</td>
+            <td>{{ product[2] }}円</td>
+            <td>{{ product[3] }}</td>
+            <td><a href="{{ url_for('edit_product', product_id=product[0]) }}">編集</a></td>  <!-- 編集リンクにproduct_idを渡す -->
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 
     <div class="button-container">
         <a href="{{ url_for('return_edit') }}" class="button">戻る</a>
@@ -132,6 +136,11 @@
             inputProductName.value = name;
         }
 
+        function goToProductEditPage(productId) {
+            // 商品IDを使ってproduct_edit.htmlに遷移
+            window.location.href = "/edit_product/" + productId;
+        }
+
         // inputイベントで自動補完を実行
         inputProductName.addEventListener('input', searchProduct);
 
@@ -144,7 +153,6 @@
                 },
             {% endfor %}
         };
-
     </script>
 </body>
 </html>

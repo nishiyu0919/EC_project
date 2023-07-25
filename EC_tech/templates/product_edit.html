@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/css/list.css">
+    <title>商品情報編集</title>
+</head>
+<body>
+    <h1>商品情報編集</h1>
+<form id="editForm" method="post" action="{{ url_for('update_product', product_id=product[0]) }}">
+    <label for="edit_product_name">商品名：</label>
+    <!-- 商品名の欄にデータベースから取得した商品名を表示させる -->
+    <input type="text" id="edit_product_name" name="edit_product_name" value="{{ product[1] }}" required><br>
+    <label for="edit_product_price">価格：</label>
+    <!-- 価格の欄にデータベースから取得した価格を表示させる -->
+    <input type="number" id="edit_product_price" name="edit_product_price" value="{{ product[2] }}" required><br>
+    <label for="edit_product_description">説明：</label>
+    <!-- 説明の欄にデータベースから取得した説明を表示させる -->
+    <textarea id="edit_product_description" name="edit_product_description" required>{{ product[3] }}</textarea><br>
+    <button type="submit" class="button">更新</button> <!-- Use a button for submitting the form -->
+</form>
+
+
+    <div class="button-container">
+        <!-- 戻るボタン -->
+        <a href="{{ url_for('return_edit') }}" class="button">戻る</a>
+    </div>
+
+    <!-- JavaScriptの追加 -->
+    <script>
+        const allProducts = {
+            {% for product in products %}
+                "{{ product[1] }}": {
+                    "price": "{{ product[2] }}",
+                    "description": "{{ product[3] }}"
+                },
+            {% endfor %}
+        };
+
+        function setProductName(name) {
+            // 商品名の欄にクリックされた商品名を設定する
+            document.getElementById('edit_product_name').value = name;
+            document.getElementById('edit_product_price').value = allProducts[name]['price'];
+            document.getElementById('edit_product_description').value = allProducts[name]['description'];
+        }
+
+        // 商品情報編集フォームの送信前に、削除フォームの商品名も更新する
+        document.getElementById('editForm').onsubmit = function() {
+            const productName = document.getElementById('edit_product_name').value;
+            document.getElementById('product_name').value = productName;
+        };
+    </script>
+</body>
+</html>

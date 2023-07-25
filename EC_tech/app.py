@@ -1,5 +1,5 @@
 from datetime import timedelta
-from flask import Flask, render_template, redirect, request, url_for, session
+from flask import Flask, render_template, redirect, request, url_for, session, jsonify
 import db
 import string
 import random
@@ -8,18 +8,24 @@ import re
 app = Flask(__name__)
 app.secret_key = ''.join(random.choices(string.ascii_letters, k=256))
 
+# get_product_by_id() 関数が含まれる db.py への import
+
 
 @app.route('/', methods=['GET'])
 def index():
+    products = session.get('products') or db.get_products()  # セッションに商品リストがあればそれを取得、なければDBから取得
+    session['products'] = products  # 商品リストをセッションに保持
+   
+   
     if 'user' in session:
-        return redirect(url_for('top'))
-
-    msg = request.args.get('msg')
-
-    if msg is None or request.referrer == url_for('login'):
-        return render_template('top.html')
+        return render_template('top.html', products=products, username=session['user'])
     else:
-        return render_template('index.html', msg=msg)
+        msg = request.args.get('msg')
+        if msg is None or request.referrer == url_for('login'):
+            return render_template('top.html', products=products)
+        else:
+            return render_template('index.html', msg=msg)
+        
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -44,13 +50,20 @@ def login():
     else:
         return render_template('index.html')
 
-
 @app.route('/top', methods=['GET'])
 def top():
-    if 'user' in session:
-        return render_template('top.html', username=session['user'])
+    search_keyword = request.args.get('search')
+
+    if search_keyword:
+        session['search_keyword'] = search_keyword
+        products = db.search_products_by_name(search_keyword)
     else:
-        return render_template('index.html', msg='ログインが必要です')
+        session.pop('search_keyword', None)
+        products = db.get_products()
+
+        return render_template('top.html', products=products, search_keyword=search_keyword)
+
+
 
 
 @app.route('/logout')
@@ -283,5 +296,122 @@ def delete_product():
         error = '商品が見つかりませんでした。'
         return render_template('products_list.html', error=error , products=products)
 
+@app.route('/edit_list')
+def edit_list():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+
+    products = db.get_all_products()
+    return render_template('edit_list.html', products=products)
+
+@app.route('/edit_product/<int:product_id>', methods=['GET', 'POST'])
+def edit_product(product_id):
+    product = db.get_product_by_id(product_id)  # 修正：関数名を修正
+    if product:
+        return render_template('product_edit.html', product=product)
+    else:
+        return "商品が見つかりません", 404
+
+@app.route('/update_product/<int:product_id>', methods=['POST'])
+def update_product(product_id):
+    if request.method == 'POST':
+        product_name = request.form.get('edit_product_name')
+        product_price = float(request.form.get('edit_product_price'))
+        product_description = request.form.get('edit_product_description')
+
+        # データベースで商品情報を更新する
+        count = db.update_product(product_id, product_name, product_price, product_description)
+        products = db.get_products()
+
+        if count == 1:
+            msg = '商品情報が更新されました。'
+        else:
+            msg = '商品情報の更新に失敗しました。'
+
+        # 更新された商品リストを表示するために、edit_list ルートにリダイレクトする
+        return render_template('edit_list.html', msg=msg, products=products)  # 修正：url_forを使用してリダイレクト
+
+
+
+# 他のルートの定義など（省略）
+
+@app.route('/search', methods=['POST'])
+def search():
+    search_keyword = request.form.get('search')
+    products = db.search_products_by_name(search_keyword)
+
+    if products:
+        # 検索結果がある場合は、その商品リストをtop.htmlに表示
+        return render_template('top.html', products=products, search_keyword=search_keyword)
+    else:
+        # 商品が見つからなかった場合はエラーメッセージを表示してtop.htmlにリダイレクト
+        error = '商品が見つかりませんでした。'
+        return render_template('top.html', error=error , products=products)
+
+
+@app.route('/product/detail/<int:product_id>')
+def product_detail(product_id):
+    product = db.get_product_by_id(product_id)
+    if product:
+        return render_template('product_detail.html', product=product)
+    else:
+        return "商品が見つかりません", 404
+
+# add_to_cart関数の定義
+def add_to_cart(product_id, quantity):
+    cart_data = session.get('cart', {})
+    cart_item = cart_data.get(product_id)
+
+    if cart_item:
+        # すでにカートに同じ商品が存在する場合は数量を加算
+        cart_item['quantity'] += quantity
+    else:
+        # カートに新しい商品として追加
+        cart_item = {
+            'product_id': product_id,
+            'quantity': quantity
+        }
+        cart_data[product_id] = cart_item
+
+    session['cart'] = cart_data
+
+@app.route('/cart', methods=['GET', 'POST'])
+def cart():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        if 'add_to_cart' in request.form:
+            product_id = request.form.get('product_id')  # 商品IDを取得
+            quantity_str = request.form.get('quantity')
+            try:
+                quantity = int(quantity_str)
+                if quantity < 1:
+                    quantity = 1
+                add_to_cart(product_id, quantity)  # カートに商品を追加する関数を呼び出す
+            except ValueError:
+                pass
+
+    cart_data = session.get('cart', {})
+    products_data = []
+    total_price = 0
+
+    for product_id, item in cart_data.items():
+        product = db.get_product_by_id(product_id)
+        if product:
+            product_info = {
+                'id': product[0],
+                'name': product[1],
+                'price': product[2],
+                'quantity': item['quantity'],
+                'subtotal': product[2] * item['quantity']
+            }
+            total_price += product_info['subtotal']
+            products_data.append(product_info)
+
+    return render_template('cart.html', products_data=products_data, total_price=total_price)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
+

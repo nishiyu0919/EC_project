@@ -1,0 +1,22 @@
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    margin: 0;
+    padding: 0px;
+    background-color: #f8f8f8; /* 背景色を指定 */
+  }
+  h1{
+    padding: 50px;
+  }
+  #product-detail {
+    text-align: center;
+    border: 2px solid #ffcccb; /* 肌色の枠を指定 */
+    padding: 20px; /* 枠内の余白を指定 */
+    background-color: #fff; /* 背景色を指定 */
+  }
+  p1{
+    padding: 50px;
+  }
