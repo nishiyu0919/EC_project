@@ -8,7 +8,11 @@ import re
 app = Flask(__name__)
 app.secret_key = ''.join(random.choices(string.ascii_letters, k=256))
 
-# get_product_by_id() 関数が含まれる db.py への import
+# Flask-Sessionの設定
+app.config['SESSION_PERMANENT'] = True
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=10)  # セッションの有効期限を10分に設定
+
 
 
 @app.route('/', methods=['GET'])
@@ -357,7 +361,12 @@ def product_detail(product_id):
     else:
         return "商品が見つかりません", 404
 
-# add_to_cart関数の定義
+def create_user_session(user_name):
+    session['user'] = user_name  # ユーザー名をセッションに格納
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=1)
+
+
 def add_to_cart(product_id, quantity):
     cart_data = session.get('cart', {})
     cart_item = cart_data.get(product_id)
@@ -373,8 +382,9 @@ def add_to_cart(product_id, quantity):
         }
         cart_data[product_id] = cart_item
 
-    session['cart'] = cart_data
+    session['cart'] = cart_data  # セッションにカート情報を保存
 
+# cartルートの定義
 @app.route('/cart', methods=['GET', 'POST'])
 def cart():
     if 'user' not in session:
@@ -382,13 +392,13 @@ def cart():
 
     if request.method == 'POST':
         if 'add_to_cart' in request.form:
-            product_id = request.form.get('product_id')  # 商品IDを取得
+            product_id = request.form.get('product_id')
             quantity_str = request.form.get('quantity')
             try:
                 quantity = int(quantity_str)
                 if quantity < 1:
                     quantity = 1
-                add_to_cart(product_id, quantity)  # カートに商品を追加する関数を呼び出す
+                add_to_cart(product_id, quantity)
             except ValueError:
                 pass
 
@@ -410,6 +420,25 @@ def cart():
             products_data.append(product_info)
 
     return render_template('cart.html', products_data=products_data, total_price=total_price)
+
+
+@app.route('/update_cart', methods=['POST'])
+def update_cart():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    cart_data = session.get('cart', {})
+    cart_json = request.get_json()
+
+    for product_id, quantity in cart_json.items():
+        if quantity < 1:
+            quantity = 1
+        cart_data[product_id]['quantity'] = quantity
+
+    session['cart'] = cart_data
+
+    return jsonify(success=True)
+
 
 
 if __name__ == "__main__":

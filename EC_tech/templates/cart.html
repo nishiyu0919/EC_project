@@ -8,7 +8,7 @@
 <body>
     <h1>カート</h1><br>
     {% if products_data %}
-    <form action="{{ url_for('cart') }}" method="post">
+    <form id="cartForm" action="{{ url_for('cart') }}" method="post">
         <!-- カートの表示 -->
         <table>
             <tr>
@@ -22,20 +22,69 @@
                 <td>{{ product.name }}</td>
                 <td>{{ product.price }}円</td>
                 <td>
-                    <input type="number" name="quantity_{{ product.id }}" value="{{ product.quantity }}" min="1">
-                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    <input type="number" name="quantity_{{ product.id }}" value="{{ product.quantity }}" min="1" data-product-id="{{ product.id }}" data-price="{{ product.price }}">
+                    <input type="hidden" name="product_id_{{ product.id }}" value="{{ product.id }}">
                 </td>
-                <td>{{ product.subtotal }}円</td>
+                <td class="subtotal" data-product-id="{{ product.id }}">{{ product.subtotal }}円</td>
             </tr>
             {% endfor %}
         </table>
-        <p>合計金額: {{ total_price }}円</p>
-        <button type="submit">数量を更新</button>
+        <p>合計金額: <span id="totalPrice">{{ total_price }}円</span></p> <!-- ここで初期値をtotal_priceに設定 -->
+        <button type="button" onclick="updateCart()">数量を更新</button>
     </form>
-{% else %}
-    <p>カートは空です。</p>
-{% endif %}
+    {% else %}
+    <p>カートは空です</p>
+    {% endif %}
 
     <p><a href="{{ url_for('index') }}">トップに戻る</a></p>
+
+    <script>
+      // JavaScript部分
+      // 初期表示時に実行して合計金額を計算し、表示する
+      function calculateTotalPrice() {
+        const quantityInputs = document.querySelectorAll('input[name^="quantity_"]');
+        let total_price = 0;
+
+        quantityInputs.forEach((input) => {
+          const productId = input.getAttribute('data-product-id');
+          const price = parseFloat(input.getAttribute('data-price'));
+          const quantity = parseInt(input.value, 10);
+          const subtotal = price * quantity;
+          total_price += subtotal;
+
+          const subtotalElement = document.querySelector(`td[data-product-id="${productId}"]`);
+          subtotalElement.textContent = `${subtotal}円`;
+        });
+
+        const totalPriceElement = document.getElementById('totalPrice');
+        totalPriceElement.textContent = `${total_price}円`;
+
+        return total_price;
+      }
+
+      function updateCart() {
+        const total_price = calculateTotalPrice();
+        const cartData = {};
+
+        const quantityInputs = document.querySelectorAll('input[name^="quantity_"]');
+        quantityInputs.forEach((input) => {
+          const productId = input.getAttribute('data-product-id');
+          const quantity = parseInt(input.value, 10);
+          cartData[productId] = quantity;
+        });
+
+        localStorage.setItem('cartData', JSON.stringify(cartData));
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '{{ url_for("update_cart") }}', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify(cartData));
+      }
+
+      // ページ読み込み時に実行して合計金額を計算して表示する
+      window.onload = function() {
+        calculateTotalPrice();
+      };
+    </script>
 </body>
 </html>

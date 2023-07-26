@@ -14,18 +14,38 @@
         <p>価格: ¥{{ product[2] }}</p>
         <p>{{ product[3] }}</p>
         {% if 'user' in session %}
-     <form action="{{ url_for('cart') }}" method="post">
-    <label for="quantity">数量:</label>
-    <input type="number" id="quantity" name="quantity" value="1" min="1">
-    <input type="hidden" name="product_id" value="{{ product[0] }}"> <!-- 商品IDを追加 -->
-    <button type="submit" name="add_to_cart">カートに入れる</button>
-</form>
-
+        <form action="{{ url_for('cart') }}" method="post">
+            <label for="quantity">数量:</label>
+            <input type="number" id="quantity" name="quantity" value="1" min="1">
+            <input type="hidden" name="product_id" value="{{ product[0] }}"> <!-- 商品IDを追加 -->
+            <button type="submit" name="add_to_cart">カートに入れる</button>
+        </form>
         {% else %}
         <p><a href="{{ url_for('login') }}">ログインしてカートに追加</a></p>
         {% endif %}
-        
     </div>
+    <!-- 省略 -->
+<!-- 省略 -->
+<script>
+    // カートに追加する関数
+    function addToCart(productId, quantity) {
+      // ローカルストレージからカート情報を取得
+      const cartData = JSON.parse(localStorage.getItem('cartData')) || {};
+      cartData[productId] = quantity;
+  
+      // ローカルストレージにカート情報を保存
+      localStorage.setItem('cartData', JSON.stringify(cartData));
+  
+      // カート情報をサーバーに非同期で送信
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '{{ url_for("update_cart") }}', true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.send(JSON.stringify(cartData));
+    }
+  </script>
+  <!-- 省略 -->
+  
+  
     <p><a href="{{ url_for('index') }}">トップに戻る</a></p>
 </body>
 </html>
